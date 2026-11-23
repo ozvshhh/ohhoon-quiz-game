@@ -1,0 +1,697 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>오훈 교수님의 질문 공격</title>
+<style>
+  :root{
+    --bg:#13161d; --panel:#1d222c; --line:#2d3442; --text:#e9edf5; --sub:#9aa5b8;
+    --prof:#ff6b4a; --stud:#ffb43d; --ok:#4ad295; --wood:#8d6240; --floor:#262b36;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;height:100%}
+  body{
+    background:radial-gradient(1200px 700px at 50% -10%,#1b2130,var(--bg));
+    color:var(--text); font-family:-apple-system,BlinkMacSystemFont,"Apple SD Gothic Neo","Pretendard",sans-serif;
+    display:flex; align-items:center; justify-content:center; padding:16px;
+  }
+  #wrap{width:min(920px,100%)}
+  header{display:flex;align-items:baseline;gap:10px;margin:0 0 10px}
+  h1{font-size:19px;margin:0;letter-spacing:-.4px}
+  header small{color:var(--sub);font-size:12px}
+
+  /* 분노 연출 */
+  #prof svg, .ch{transition:filter .25s}
+  #prof.mad svg{animation:tremble .5s infinite}
+  #prof.furious svg{animation:tremble .14s infinite}
+  .seat.hot .ch{animation:tremble .35s infinite}
+  .seat.hot .emo.rage{opacity:1}
+  .steam{position:absolute;top:-20px;left:50%;transform:translateX(-50%);font-size:22px;opacity:0;transition:opacity .25s}
+  #prof.mad .steam{opacity:1}
+  @keyframes tremble{0%{transform:translateX(-1.5px)}100%{transform:translateX(1.5px)}}
+
+  /* 강의실 벽시계 (전자시계) */
+  #clock{position:absolute;left:50%;top:10px;transform:translateX(-50%);
+    background:#0a0d12;border:3px solid #333b49;border-radius:9px;padding:5px 16px 4px;
+    box-shadow:0 4px 12px rgba(0,0,0,.5),inset 0 0 14px rgba(0,0,0,.9);
+    display:flex;align-items:baseline;gap:7px}
+  #clock .digits{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:24px;font-weight:700;
+    letter-spacing:2px;color:#f4f8ff;text-shadow:0 0 8px rgba(226,239,255,.9),0 0 20px rgba(190,214,255,.5)}
+  #clock .unit{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:2px;
+    color:#dce7f7;opacity:.55}
+  #clock .dot{width:5px;height:5px;border-radius:50%;background:#f4f8ff;align-self:center;
+    box-shadow:0 0 7px rgba(226,239,255,.9);animation:blink 1s steps(1,end) infinite}
+  @keyframes blink{50%{opacity:.15}}
+
+  /* 강의실 */
+  #room{position:relative;height:620px;border-radius:16px;border:1px solid var(--line);overflow:hidden;background:var(--floor)}
+  #stage{position:absolute;left:0;top:0;width:920px;height:620px;transform-origin:top left;
+    background:linear-gradient(180deg,#232936 0 176px,var(--floor) 176px)}
+  #board{position:absolute;left:60px;right:60px;top:60px;height:100px;border-radius:8px;
+    background:#1f3b31;border:7px solid var(--wood);box-shadow:inset 0 0 40px rgba(0,0,0,.5);
+    color:#cfe8dd;font-size:15px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;text-align:center;padding:0 18px;line-height:1.5}
+  #board .chalkCode{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:14px;color:#9fd9c4;letter-spacing:.5px;opacity:.85;border-bottom:1px dashed rgba(159,217,196,.35);padding-bottom:3px}
+  #board .chalk{opacity:.9}
+
+  .seat{position:absolute;width:112px;transform:translate(-50%,-50%);text-align:center}
+  .desk{height:16px;background:#6f4e33;border-radius:4px;box-shadow:0 4px 0 #4e3724;margin-top:-6px}
+  .nameTag{font-size:10px;color:var(--sub);margin-top:4px;letter-spacing:-.3px}
+  .ch{width:76px;height:86px;margin:0 auto;display:block;transition:transform .2s}
+  .seat.pretend .ch{transform:translateY(-4px) scale(1.04)}
+  .seat.angry .ch{animation:shake .18s infinite}
+  @keyframes shake{0%{transform:translateX(-2px) rotate(-2deg)}100%{transform:translateX(2px) rotate(2deg)}}
+  .eyesAngry,.eyesSparkle,.vein{display:none}
+  .seat.pretend .eyesSparkle{display:inline}
+  .seat.pretend .eyesNormal{display:none}
+  .seat.angry .eyesAngry{display:inline}
+  .seat.angry .eyesNormal,.seat.angry .eyesSparkle{display:none}
+  .seat.angry .vein{display:inline}
+  .emo{position:absolute;top:-16px;left:50%;transform:translateX(-50%);font-size:20px;opacity:0;transition:opacity .2s}
+  .seat.pretend .emo.book{opacity:1}
+  .seat.angry .emo.rage{opacity:1}
+
+  #hauen{z-index:3}
+  #hauen .nameTag{color:#8fd7ff;font-weight:700;font-size:11px}
+  #hauen.sweat .emo.sweat{opacity:1}
+
+  #prof{position:absolute;width:120px;transform:translate(-50%,-50%);transition:left .75s cubic-bezier(.4,.1,.3,1),top .75s cubic-bezier(.4,.1,.3,1);z-index:5;text-align:center}
+  #prof svg{width:104px;height:124px;display:block;margin:0 auto}
+  #prof .nameTag{color:#ffd9a0;font-size:11px;font-weight:700}
+  #prof.mad .pvein{display:inline}
+  .pvein{display:none}
+
+  .bubble{position:absolute;left:50%;bottom:100%;transform:translate(-50%,-6px);
+    background:#fff;color:#16181d;border-radius:12px;padding:7px 11px;font-size:12.5px;font-weight:600;
+    white-space:nowrap;box-shadow:0 6px 18px rgba(0,0,0,.4);opacity:0;transition:opacity .15s;pointer-events:none}
+  .bubble.show{opacity:1}
+  .bubble:after{content:"";position:absolute;top:100%;left:50%;margin-left:-6px;border:6px solid transparent;border-top-color:#fff}
+  .bubble.q{background:#ffe9c9}
+  .bubble.a{background:#cfe9ff}
+
+  /* 질문 타이머 */
+  #answerBtn{position:relative;overflow:hidden}
+  #qfill{position:absolute;left:0;top:0;bottom:0;width:0;background:rgba(255,255,255,.3);pointer-events:none}
+  #answerBtn span.lbl{position:relative}
+
+  #toast{position:absolute;left:50%;top:190px;transform:translateX(-50%);font-size:13px;font-weight:700;
+    padding:6px 12px;border-radius:99px;background:rgba(0,0,0,.55);opacity:0;transition:opacity .2s;z-index:7}
+  #toast.show{opacity:1}
+
+  /* 오버레이 */
+  #overlay{position:absolute;inset:0;background:rgba(10,12,17,.86);backdrop-filter:blur(3px);
+    display:flex;flex-direction:column;align-items:center;justify-content:center;gap:12px;text-align:center;padding:26px;z-index:20}
+  #overlay.hide{display:none}
+  #overlay h2{margin:0;font-size:26px;letter-spacing:-.6px}
+  #overlay p{margin:0;color:var(--sub);font-size:13.5px;line-height:1.75;max-width:560px}
+  #overlay .keycap{display:inline-block;background:#2a3140;border:1px solid #3a4457;border-bottom-width:3px;
+    border-radius:6px;padding:1px 8px;font-size:12px;font-weight:700;color:#e9edf5}
+  button{font:inherit;font-weight:700;border:0;border-radius:11px;padding:11px 22px;cursor:pointer;
+    background:linear-gradient(180deg,#5aa0ff,#3b7fe0);color:#fff;box-shadow:0 4px 0 #2a5ea8}
+  button:active{transform:translateY(2px);box-shadow:0 2px 0 #2a5ea8}
+  #answerBtn{width:100%;margin-top:10px;background:linear-gradient(180deg,#58dca3,#2fae7d);box-shadow:0 4px 0 #22855f}
+  #answerBtn:active{box-shadow:0 2px 0 #22855f}
+  #answerBtn:disabled{opacity:.35;cursor:default}
+  .stats{font-size:12.5px;color:var(--sub)}
+  /* 리더보드 */
+  #lbBox{width:min(380px,92%);background:rgba(20,24,32,.9);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+  #lbBox .lbTitle{font-size:12px;letter-spacing:1px;color:var(--sub);text-align:center;margin-bottom:9px;
+    text-transform:uppercase;font-weight:700}
+  #lbList{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;max-height:208px;overflow:auto}
+  #lbList li{display:flex;align-items:center;gap:9px;font-size:13px;padding:4px 7px;border-radius:7px;background:rgba(255,255,255,.03)}
+  #lbList li.me{background:rgba(90,160,255,.18);outline:1px solid rgba(90,160,255,.4)}
+  #lbList .rk{width:20px;text-align:right;color:var(--sub);font-size:11px;font-weight:700}
+  #lbList li:nth-child(1) .rk{color:#ffd45e} #lbList li:nth-child(2) .rk{color:#d8dde8} #lbList li:nth-child(3) .rk{color:#d79a6a}
+  #lbList .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  #lbList .tm{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;letter-spacing:.5px}
+  #lbBox .lbNote{font-size:11px;color:var(--sub);text-align:center;margin-top:8px;opacity:.8}
+  #saveRow{display:flex;gap:8px;width:min(380px,92%)}
+  #saveRow.hide{display:none}
+  #nameInput{flex:1;min-width:0;font:inherit;font-size:14px;padding:10px 12px;border-radius:10px;
+    border:1px solid var(--line);background:#141922;color:var(--text);outline:none}
+  #nameInput:focus{border-color:#4aa8ff}
+  #saveBtn{padding:10px 16px;background:linear-gradient(180deg,#58dca3,#2fae7d);box-shadow:0 4px 0 #22855f}
+  #saveBtn:disabled{opacity:.45}
+  .stats b{color:var(--text)}
+</style>
+</head>
+<body>
+<div id="wrap">
+  <header>
+    <h1>오훈 교수님의 질문 공격</h1>
+    <small>— 이하은의 컴퓨터구조 생존기</small>
+  </header>
+
+  <div id="room">
+    <div id="clock"><span class="dot"></span><span class="digits" id="clockTxt">00.000</span><span class="unit">SEC</span></div>
+    <div id="board"><span class="chalk" id="boardTxt">컴퓨터구조 · MIPS 명령어 집합</span><span class="chalkCode" id="boardCode">add $t0, $s1, $s2</span></div>
+    <div id="toast"></div>
+
+    <div id="prof">
+      <div class="bubble q" id="profBubble"></div>
+      <div class="steam">💢</div>
+      <svg viewBox="0 0 70 86" aria-label="오훈 교수님">
+        <!-- 몸 (정장) -->
+        <path d="M18 56h34c3 0 5 2 5 5v22H13V61c0-3 2-5 5-5z" fill="#3c4760"/>
+        <path d="M35 56l-9 5 9 22 9-22-9-5z" fill="#eef2f8"/>
+        <path d="M35 60l-3 4 3 14 3-14-3-4z" fill="#c0392b"/>
+        <!-- 목 -->
+        <rect class="pskin3" x="31" y="48" width="8" height="10" rx="3" fill="#e8b489"/>
+        <!-- 대머리 -->
+        <ellipse class="pskin" cx="35" cy="30" rx="19" ry="21" fill="#f0bf92"/>
+        <ellipse class="pskin2" cx="35" cy="17" rx="13" ry="8" fill="#f6cda4" opacity=".55"/>
+        <!-- 옆머리 (하얀) -->
+        <path d="M16 32c-2 6-1 12 1 16-5-6-6-14-1-20z" fill="#e7ebf1"/>
+        <path d="M54 32c2 6 1 12-1 16 5-6 6-14 1-20z" fill="#e7ebf1"/>
+        <!-- 안경 -->
+        <circle cx="27" cy="31" r="7" fill="#dff0ff" opacity=".65" stroke="#2b3240" stroke-width="2"/>
+        <circle cx="43" cy="31" r="7" fill="#dff0ff" opacity=".65" stroke="#2b3240" stroke-width="2"/>
+        <path d="M34 31h2" stroke="#2b3240" stroke-width="2"/>
+        <!-- 눈 -->
+        <circle cx="27" cy="31" r="2.2" fill="#1b1f29"/>
+        <circle cx="43" cy="31" r="2.2" fill="#1b1f29"/>
+        <!-- 흰 수염 -->
+        <path d="M27 42q8 6 16 0q-2 7-8 7t-8-7z" fill="#eceff4"/>
+        <path d="M30 40q5 3 10 0" stroke="#eceff4" stroke-width="3" fill="none" stroke-linecap="round"/>
+        <!-- 분노 핏대 -->
+        <g class="pvein">
+          <path d="M14 14l6 5M20 12l3 7" stroke="#ff5a3c" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M56 14l-6 5M50 12l-3 7" stroke="#ff5a3c" stroke-width="2.4" stroke-linecap="round"/>
+        </g>
+      </svg>
+      <div class="nameTag">오훈 교수님</div>
+    </div>
+<div id="overlay">
+  <h2 id="ovTitle">강의실에 들어섰다</h2>
+  <p id="ovText">
+    당신은 <b>컴공과 이하은</b>. 오훈 교수님의 <b>컴퓨터구조</b> 강의, 맨 뒷자리에 앉아 있다.<br>
+    오훈 교수님이 주기적으로 질문을 던진다. <span class="keycap">SPACE</span> 로 대답하라.<br><br>
+    · 대답을 <b>안 하면</b> 교수님 얼굴이 점점 빨개진다 → 터지면 게임 오버<br>
+    · 대답을 <b>하면</b> 교수님이 뒷편으로 걸어온다. 주변 학생들은 열심히 듣는 척하며 분노를 모으고,
+    교수님이 앞으로 돌아가면 당신을 노려본다. 그들의 얼굴도 점점 빨개진다 → 터지면 게임 오버<br>
+    · 질문 주기는 시간이 갈수록 <b>짧아진다</b>. 끝은 정해져 있다. 얼마나 버티는지가 점수다.
+  </p>
+  <div class="stats" id="ovStats"></div>
+  <div id="saveRow" class="hide">
+    <input id="nameInput" maxlength="12" placeholder="이름을 남기세요" autocomplete="off">
+    <button id="saveBtn">기록 등록</button>
+  </div>
+  <div id="lbBox">
+    <div class="lbTitle">🏆 명예의 전당</div>
+    <ol id="lbList"></ol>
+    <div class="lbNote" id="lbNote">불러오는 중…</div>
+  </div>
+  <button id="startBtn">수업 시작</button>
+</div>
+  </div>
+
+  <button id="answerBtn" disabled><span id="qfill"></span><span class="lbl">대답하기 &nbsp;<span class="keycap" style="color:#0d3a28;background:#d8fff0;border-color:#9fe6cb">SPACE</span></span></button>
+
+  </div>
+
+<script>
+(function(){
+  "use strict";
+  const room = document.getElementById('room');
+  // 창이 좁아도 강의실 전체가 보이도록 고정 레이아웃을 스케일링
+  const stage = document.createElement('div');
+  stage.id = 'stage';
+  while(room.firstChild) stage.appendChild(room.firstChild);
+  room.appendChild(stage);
+  function fitStage(){
+    const k = Math.min(1, room.clientWidth/920);
+    stage.style.transform = 'scale('+k+')';
+    room.style.height = (620*k)+'px';
+  }
+  window.addEventListener('resize', fitStage);
+  setTimeout(fitStage,0);
+  const profEl = document.getElementById('prof');
+  const profBubble = document.getElementById('profBubble');
+  const qtimerFill = document.getElementById('qfill');
+  const toastEl = document.getElementById('toast');
+  const overlay = document.getElementById('overlay');
+  const ovTitle = document.getElementById('ovTitle');
+  const ovText = document.getElementById('ovText');
+  const ovStats = document.getElementById('ovStats');
+  const startBtn = document.getElementById('startBtn');
+  const answerBtn = document.getElementById('answerBtn');
+  const boardTxt = document.getElementById('boardTxt');
+  const boardCode = document.getElementById('boardCode');
+  const clockTxt = document.getElementById('clockTxt');
+
+  const COLS = 4, ROWS = 4;
+  const SX = c => 118 + c*180;
+  const SY = r => 250 + r*96;
+  const HAUEN = {r:3, c:1};   // 맨 뒷줄, 왼쪽에서 2번째
+  const PROF_FRONT = {x:400, y:205};
+  const PROF_BACK  = {x:SX(HAUEN.c)+92, y:SY(HAUEN.r)-14};
+
+  const SOMIN = {r:2, c:0};   // 뒤에서 2번째 줄, 가장 왼쪽
+  const HAIR = ['#2b2b33','#4a3426','#1f2430','#5a3b2a','#2f3a4a','#3a2b36'];
+  const NAMES = ['김','이','박','최','정','강','조','윤','장','임','한','오','서','신','권','황'];
+
+  // 학생 생성
+  const seats = [];
+  let seatIdx = 0;
+  for(let r=0;r<ROWS;r++){
+    for(let c=0;c<COLS;c++){
+      const isHauen = (r===HAUEN.r && c===HAUEN.c);
+      const isSomin = (r===SOMIN.r && c===SOMIN.c);
+      const el = document.createElement('div');
+      el.className = 'seat';
+      el.style.left = SX(c)+'px';
+      el.style.top = SY(r)+'px';
+      if(isHauen) el.id = 'hauen';
+      if(isSomin) el.id = 'somin';
+      const hair = isHauen ? '#2a2f3a' : isSomin ? '#7a4a2a' : HAIR[(seatIdx*5+r)%HAIR.length];
+      const shirt = isHauen ? '#4aa8ff' : isSomin ? '#1b1d22' : ['#58606e','#6b7382','#4e5664','#7a8292'][(seatIdx+c)%4];
+      el.innerHTML =
+        '<div class="emo book">📖</div><div class="emo rage">💢</div><div class="emo sweat">💧</div>'+
+        (isHauen ? '<div class="bubble a" id="hauenBubble"></div>' : '')+
+        studentSVG(hair, shirt, isSomin)+
+        '<div class="desk"></div>'+
+        '<div class="nameTag">'+(isHauen?'이하은 (컴공)':isSomin?'최소민':NAMES[(seatIdx*3)%NAMES.length]+'OO')+'</div>';
+      stage.appendChild(el);
+      // 교수님 뒷편 위치 주변 = 이하은 인접 좌석
+      const near = !isHauen && Math.abs(r-HAUEN.r)<=1 && Math.abs(c-HAUEN.c)<=1;
+      seats.push({el, r, c, isHauen, near, rage:0,
+                  skin: el.querySelector('.skin'), skin2: el.querySelector('.skin2')});
+      seatIdx++;
+    }
+  }
+  const nearSeats = seats.filter(s=>s.near);
+  const hauenEl = document.getElementById('hauen');
+  const hauenBubble = document.getElementById('hauenBubble');
+
+  function studentSVG(hair, shirt, bob){
+    // bob = 갈색 중단발 (턱선까지 내려오는 옆머리)
+    const bobHair = bob ?
+      '<path d="M12 23c0-12 7-18 18-18s18 6 18 18v15c0 4-2 7-5 7V25c-4-5-8-7-13-7s-9 2-13 7v20c-3 0-5-3-5-7V23z" fill="'+hair+'"/>'+
+      '<path d="M15 21c3-8 8-11 15-11s12 3 15 11c-4-6-9-8-15-8s-11 2-15 8z" fill="'+hair+'"/>'
+      : '';
+    return '<svg class="ch" viewBox="0 0 60 70">'+
+      '<path d="M14 46h32c3 0 5 2 5 5v16H9V51c0-3 2-5 5-5z" fill="'+shirt+'"/>'+
+      '<rect class="skin2" x="26" y="38" width="8" height="10" rx="3" fill="#e8b489"/>'+
+      '<ellipse class="skin" cx="30" cy="24" rx="16" ry="17" fill="#f0c096"/>'+
+      (bob ? bobHair : '<path d="M14 21c1-11 7-15 16-15s15 4 16 15c-4-6-9-8-16-8s-12 2-16 8z" fill="'+hair+'"/>')+
+      '<g class="eyesNormal">'+
+        '<circle cx="24" cy="25" r="2.1" fill="#1b1f29"/><circle cx="36" cy="25" r="2.1" fill="#1b1f29"/>'+
+        '<path d="M26 33q4 3 8 0" stroke="#b5765a" stroke-width="1.8" fill="none" stroke-linecap="round"/>'+
+      '</g>'+
+      '<g class="eyesSparkle">'+
+        '<circle cx="24" cy="25" r="3" fill="#1b1f29"/><circle cx="36" cy="25" r="3" fill="#1b1f29"/>'+
+        '<circle cx="25.2" cy="23.8" r="1.1" fill="#fff"/><circle cx="37.2" cy="23.8" r="1.1" fill="#fff"/>'+
+        '<path d="M26 33q4 4 8 0" stroke="#b5765a" stroke-width="1.8" fill="none" stroke-linecap="round"/>'+
+      '</g>'+
+      '<g class="eyesAngry">'+
+        '<circle cx="24" cy="26" r="2.1" fill="#1b1f29"/><circle cx="36" cy="26" r="2.1" fill="#1b1f29"/>'+
+        '<path d="M20 21l7 3M40 21l-7 3" stroke="#1b1f29" stroke-width="2.2" stroke-linecap="round"/>'+
+        '<path d="M26 34q4-3 8 0" stroke="#8c4a35" stroke-width="1.8" fill="none" stroke-linecap="round"/>'+
+      '</g>'+
+      '<g class="vein"><path d="M44 12l5 4M48 10l2 6" stroke="#ff5a3c" stroke-width="2" stroke-linecap="round"/></g>'+
+    '</svg>';
+  }
+
+  const QA = [
+    ['MIPS R-format의 필드 구성, 말해볼 사람?', 'op, rs, rt, rd, shamt, funct 입니다!'],
+    ['lw랑 sw, 방향이 어떻게 되지?', 'lw는 메모리→레지스터, sw는 반대요'],
+    ['$zero 레지스터에는 뭐가 들어있지?', '항상 0입니다'],
+    ['파이프라인 5단계 순서대로 말해봐', 'IF, ID, EX, MEM, WB요!'],
+    ['데이터 해저드는 어떻게 해결하나?', '포워딩이요, 안 되면 스톨입니다'],
+    ['beq는 어떤 명령어 포맷이지?', 'I-format입니다'],
+    ['2의 보수로 -5를 8비트로 쓰면?', '1111 1011 입니다'],
+    ['캐시 미스 세 종류, 아는 사람?', 'Compulsory, Capacity, Conflict요'],
+    ['jal은 뭘 어디에 저장하지?', '복귀 주소를 $ra에 저장합니다'],
+    ['지역성 두 가지가 뭐였지?', '시간 지역성과 공간 지역성이요'],
+    ['ALU 제어 신호는 뭘로 만들지?', 'ALUOp랑 funct 필드로 만듭니다'],
+    ['엔디안 방식 두 가지는?', '빅 엔디안이랑 리틀 엔디안이요'],
+    ['CPI가 뭘 뜻하지?', '명령어당 클럭 사이클 수입니다'],
+    ['분기 명령에서 PC는 어떻게 계산되나?', 'PC+4에 offset×4를 더합니다'],
+    ['MIPS 레지스터 하나는 몇 비트야?', '32비트입니다'],
+    ['구조적 해저드가 생기는 이유는?', '하드웨어 자원이 부족해서요']
+  ];
+  const QUESTIONS = QA.map(x=>x[0]);
+  const ANSWERS = QA.map(x=>x[1]);
+  const BOARDS = [
+    ['컴퓨터구조 · MIPS 명령어 집합', 'add $t0, $s1, $s2'],
+    ['단일 사이클 데이터패스', 'lw  $t0, 8($s3)'],
+    ['파이프라인과 해저드', 'beq $t1, $t2, LOOP'],
+    ['캐시 메모리와 지역성', 'sw  $s0, 0($sp)'],
+    ['2의 보수와 오버플로', 'sub $t3, $t1, $t2'],
+    ['ALU 설계와 제어', 'and $t4, $t5, $t6'],
+    ['프로시저 호출 규약', 'jal factorial'],
+    ['메모리 계층 구조', 'addi $sp, $sp, -8']
+  ];
+
+  const S = {};
+  function reset(){
+    S.running=false; S.over=false; S.t=0;
+    S.profAnger=0; S.studAnger=0;
+    S.answers=0; S.misses=0; S.visits=0;
+    S.qActive=false; S.qStart=0; S.qWindow=0; S.nextQ=1.4;
+    S.profAt='front'; S.backUntil=0; S.walkUntil=0;
+    S.glareUntil=0; S.toastUntil=0;
+    seats.forEach(s=>{ s.rage=0; s.el.classList.remove('pretend','angry','hot');
+      s.skin.setAttribute('fill','#f0c096'); s.skin2.setAttribute('fill','#e8b489'); });
+    profEl.classList.remove('mad','furious');
+    hauenEl.classList.remove('sweat');
+    moveProf(PROF_FRONT);
+    hideBubble(profBubble); hideBubble(hauenBubble);
+    qtimerFill.style.width='0%';
+    answerBtn.disabled = true;
+    render();
+  }
+  function moveProf(p){ profEl.style.left=p.x+'px'; profEl.style.top=p.y+'px'; }
+  function showBubble(el, txt){ el.textContent=txt; el.classList.add('show'); }
+  function hideBubble(el){ if(el) el.classList.remove('show'); }
+  function toast(txt, color){
+    toastEl.textContent = txt;
+    toastEl.style.color = color || '#fff';
+    toastEl.classList.add('show');
+    S.toastUntil = S.t + 1.1;
+  }
+
+  // 난이도 곡선
+  const cycle  = t => Math.max(1.2, 4.0 - t*0.08);           // 질문 주기 (점점 짧아짐)
+  const window_= t => Math.max(0.55, 1.6 - t*0.030);        // 대답 가능 시간
+  const backDur= () => 1.5;                                  // 뒷편 체류 시간
+
+  function askQuestion(){
+    S.qActive = true;
+    S.qStart = S.t;
+    S.qWindow = window_(S.t);
+    showBubble(profBubble, QUESTIONS[(Math.random()*QUESTIONS.length)|0]);
+    answerBtn.disabled = false;
+    hauenEl.classList.add('sweat');
+  }
+
+  function endQuestion(){
+    S.qActive=false;
+    hideBubble(profBubble);
+    qtimerFill.style.width='0%';
+    answerBtn.disabled = true;
+    hauenEl.classList.remove('sweat');
+  }
+
+  function doAnswer(){
+    if(!S.running || S.over) return;
+    if(!S.qActive){
+      // 아무도 안 물어봤는데 말함
+      S.studAnger += 6; S.profAnger += 3;
+      toast('교수님: "...질문 안 했는데?"', '#ffd27a');
+      return;
+    }
+    const i = (Math.random()*ANSWERS.length)|0;
+    showBubble(hauenBubble, ANSWERS[i]);
+    setTimeout(()=>hideBubble(hauenBubble), 1600);
+    endQuestion();
+    S.answers++;
+    S.profAnger = Math.max(0, S.profAnger - 10.5);
+    // 교수님이 뒷편으로 온다
+    S.visits++;
+    S.profAt='back';
+    S.backUntil = S.t + backDur();
+    moveProf(PROF_BACK);
+    nearSeats.forEach(s=>{ s.el.classList.add('pretend'); s.el.classList.remove('angry'); });
+    toast('좋은 대답이야! 교수님이 뒷편으로 온다', '#8fd7ff');
+    const b = BOARDS[(Math.random()*BOARDS.length)|0];
+    boardTxt.textContent = b[0]; boardCode.textContent = b[1];
+  }
+
+  function doMiss(){
+    endQuestion();
+    S.misses++;
+    S.profAnger += 21;
+    toast('침묵... 교수님의 분노가 쌓인다', '#ff8e6b');
+  }
+
+  function profGoFront(){
+    S.profAt='front';
+    moveProf(PROF_FRONT);
+    // 노려보기 (분노 폭발)
+    const burst = 15 + S.visits*2.3;             // 노려보기 순간 폭발량
+    S.studAnger += burst;
+    nearSeats.forEach(s=>{ s.el.classList.remove('pretend'); s.el.classList.add('angry'); });
+    S.glareUntil = S.t + 1.0;
+    toast('주변 학생들이 이하은을 노려본다...', '#ffb43d');
+  }
+
+  // 두 색을 t(0~1)만큼 섞는다
+  function mix(a, b, t){
+    t = Math.max(0, Math.min(1, t));
+    const ah=parseInt(a.slice(1),16), bh=parseInt(b.slice(1),16);
+    const r=Math.round(((ah>>16)&255)+(((bh>>16)&255)-((ah>>16)&255))*t);
+    const g=Math.round(((ah>>8)&255)+(((bh>>8)&255)-((ah>>8)&255))*t);
+    const bl=Math.round((ah&255)+((bh&255)-(ah&255))*t);
+    return '#'+((1<<24)+(r<<16)+(g<<8)+bl).toString(16).slice(1);
+  }
+  const RED = '#d0332a';
+  const profSkin  = profEl.querySelector('.pskin');
+  const profSkin2 = profEl.querySelector('.pskin2');
+  const profSkin3 = profEl.querySelector('.pskin3');
+
+  function render(){
+    const pa = Math.min(100,S.profAnger), sa = Math.min(100,S.studAnger);
+
+    // 교수님: 분노가 쌓일수록 얼굴(대머리)이 빨개진다
+    const pt = Math.pow(pa/100, 0.85);
+    profSkin.setAttribute('fill',  mix('#f0bf92', RED, pt));
+    profSkin2.setAttribute('fill', mix('#f6cda4', RED, pt));
+    profSkin3.setAttribute('fill', mix('#e8b489', RED, pt*0.7));
+    profEl.classList.toggle('mad', pa>=45);
+    profEl.classList.toggle('furious', pa>=78);
+
+    // 주변 학생들: 분노가 쌓일수록 얼굴이 빨개진다
+    const st = Math.pow(sa/100, 0.85);
+    nearSeats.forEach(sObj=>{
+      sObj.skin.setAttribute('fill',  mix('#f0c096', RED, st));
+      sObj.skin2.setAttribute('fill', mix('#e8b489', RED, st*0.7));
+      sObj.el.classList.toggle('hot', sa>=55);
+    });
+
+    clockTxt.textContent = S.t.toFixed(3).padStart(6,'0');
+    if(S.qActive){
+      const left = 1 - (S.t - S.qStart)/S.qWindow;
+      qtimerFill.style.width = Math.max(0,left*100)+'%';
+    }
+  }
+
+  function gameOver(kind){
+    S.over=true; S.running=false;
+    endQuestion();
+    const survived = S.t.toFixed(3);
+    S.lastTime = S.t; S.lastCause = kind; LB.myId = null;
+    saveRow.classList.remove('hide');
+    saveBtn.disabled = false; saveBtn.textContent = '기록 등록';
+    nameInput.disabled = false;
+    renderLB();
+    let title, text;
+    if(kind==='prof'){
+      title='교수님 분노 폭발 💥';
+      text='오훈 교수님: "이하은 학생, MIPS가 그렇게 재미없나?"<br>대답을 너무 안 했다. 다음 주 발표는 당신 몫이다.';
+      profEl.classList.add('mad');
+    }else{
+      title='주변 학생들의 분노 폭발 😡';
+      text='"너 때문에 교수님이 계속 뒤로 오잖아!!"<br>너무 잘 대답한 죄. 최소민이 충전기를 뽑아버렸다!!';
+      nearSeats.forEach(s=>{s.el.classList.remove('pretend');s.el.classList.add('angry')});
+    }
+    ovTitle.textContent = title;
+    ovText.innerHTML = text;
+    ovStats.innerHTML = '생존 시간 <b>'+survived+'초</b>';
+    startBtn.textContent = '다시 수강';
+    overlay.classList.remove('hide');
+  }
+
+  let last = 0;
+  function loop(now){
+    requestAnimationFrame(loop);
+    const dt = Math.min(0.05, (now-last)/1000 || 0);
+    last = now;
+    if(!S.running) return;
+    S.t += dt;
+
+    // 질문 사이클 (교수님이 앞에 있을 때만 질문)
+    if(S.profAt==='front' && !S.qActive && S.t>=S.nextQ){
+      askQuestion();
+    }
+    if(S.qActive && S.t - S.qStart > S.qWindow){
+      doMiss();
+      S.nextQ = S.t + cycle(S.t);
+    }
+
+    // 교수님 뒷편 체류
+    if(S.profAt==='back'){
+      const total = (14 + S.visits*1.5);          // 뒷편 체류 중 초당 분노 총량
+      const per = total / Math.max(1, nearSeats.length);
+      nearSeats.forEach(s=>{ s.rage += per*dt; });
+      S.studAnger += total*dt;
+      if(S.t>=S.backUntil){
+        profGoFront();
+        S.nextQ = S.t + cycle(S.t)*0.8;
+      }
+    }
+
+    // 노려보기 종료
+    if(S.glareUntil && S.t>=S.glareUntil){
+      S.glareUntil=0;
+      nearSeats.forEach(s=>s.el.classList.remove('angry'));
+    }
+
+    // 학생 분노 자연 감소 (교수님이 앞에 있고 노려보지 않을 때)
+    if(S.profAt==='front' && !S.glareUntil){
+      S.studAnger = Math.max(0, S.studAnger - 7*dt);
+    }
+
+    // 토스트 종료
+    if(S.toastUntil && S.t>=S.toastUntil){ S.toastUntil=0; toastEl.classList.remove('show'); }
+
+    render();
+
+    if(S.profAnger>=100) return gameOver('prof');
+    if(S.studAnger>=100) return gameOver('stud');
+  }
+
+
+  /* ================= 리더보드 =================
+     우선순위: ① 공개 랭킹 서버(Firebase Realtime DB, 로그인 불필요)
+               ② 아티팩트 공용 DB(claude.ai 뷰어)
+               ③ 이 브라우저 로컬 기록
+     RANK_URL 에 Firebase Realtime Database URL 을 넣으면 누구나 기록 가능.
+     예) https://ohhoon-rank-default-rtdb.firebaseio.com
+  ============================================== */
+  const RANK_URL = "";
+
+  const lbList = document.getElementById('lbList');
+  const lbNote = document.getElementById('lbNote');
+  const saveRow = document.getElementById('saveRow');
+  const nameInput = document.getElementById('nameInput');
+  const saveBtn = document.getElementById('saveBtn');
+  const LS_KEY = 'ohhoon.scores.v1', LS_NAME = 'ohhoon.name';
+
+  const LB = { mode:'local', db:null, rows:[], local:[], loaded:false, slow:false, myKey:null, timer:null };
+
+  function lsGet(k, fb){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):fb; }catch(e){ return fb; } }
+  function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
+
+  LB.local = lsGet(LS_KEY, []) || [];
+  try{ nameInput.value = lsGet(LS_NAME,'') || ''; }catch(e){}
+
+  function renderLB(){
+    const shared = LB.mode!=='local';
+    const rows = (shared ? LB.rows : LB.local).slice(0,10);
+    lbList.innerHTML = rows.map((r,i)=>{
+      const mine = LB.myKey && r.key===LB.myKey;
+      const icon = r.cause==='stud' ? '😡' : '💥';
+      const nm = String(r.name||'익명').replace(/[<>&]/g,'');
+      return '<li class="'+(mine?'me':'')+'"><span class="rk">'+(i+1)+'</span>'+
+             '<span class="nm">'+nm+' <span style="opacity:.5">'+icon+'</span></span>'+
+             '<span class="tm">'+Number(r.t||0).toFixed(3)+'s</span></li>';
+    }).join('') || '<li style="justify-content:center;color:#9aa5b8">아직 기록이 없다</li>';
+
+    if(LB.mode==='public') lbNote.textContent = '전체 랭킹 · 누구나 등록 가능';
+    else if(LB.mode==='artifact') lbNote.textContent = '전체 랭킹 · 접속 권한이 있는 사람';
+    else if(LB.slow && !LB.loaded) lbNote.textContent = '랭킹 서버 연결 중… (이 브라우저 기록 표시)';
+    else lbNote.textContent = '이 브라우저에만 저장된 기록';
+  }
+
+  /* ① 공개 랭킹 서버 (Firebase Realtime DB REST) */
+  function rankEndpoint(path){ return RANK_URL.replace(/\/+$/,'') + path; }
+  async function fetchPublic(){
+    const r = await fetch(rankEndpoint('/scores.json?orderBy="$key"&limitToLast=300'), {cache:'no-store'});
+    if(!r.ok) throw new Error('http '+r.status);
+    const data = await r.json() || {};
+    LB.rows = Object.keys(data).map(k=>Object.assign({key:k}, data[k]))
+      .filter(x=>typeof x.t==='number')
+      .sort((a,b)=>b.t-a.t);
+    LB.mode='public'; LB.loaded=true; renderLB();
+  }
+  async function pushPublic(rec){
+    const r = await fetch(rankEndpoint('/scores.json'), {
+      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(rec)
+    });
+    if(!r.ok) throw new Error('http '+r.status);
+    const out = await r.json();
+    LB.myKey = out && out.name;
+    await fetchPublic();
+  }
+
+  (async function initLB(){
+    renderLB();
+    setTimeout(()=>{ if(!LB.loaded){ LB.slow=true; renderLB(); } }, 8000);
+
+    if(RANK_URL){
+      try{
+        await fetchPublic();
+        // 오버레이가 떠 있는 동안에만 주기적으로 갱신
+        LB.timer = setInterval(()=>{
+          if(!overlay.classList.contains('hide')) fetchPublic().catch(()=>{});
+        }, 12000);
+        return;
+      }catch(e){ /* 아래로 폴백 */ }
+    }
+    try{
+      if(!(window.claude && typeof window.claude.use==='function')){ LB.loaded=true; renderLB(); return; }
+      const db = await window.claude.use('db');
+      if(!db){ LB.loaded=true; renderLB(); return; }
+      LB.db = db;
+      db.collection('scores').orderBy('t','desc').limit(10).onSnapshot(
+        snap=>{
+          LB.rows = snap.docs.map(d=>Object.assign({key:d.id}, d.data()));
+          LB.mode='artifact'; LB.loaded=true; renderLB();
+        },
+        err=>{ LB.loaded=true; renderLB(); }
+      );
+    }catch(e){ LB.loaded=true; renderLB(); }
+  })();
+
+  async function submitScore(){
+    const name = (nameInput.value||'').trim().slice(0,12) || '익명';
+    lsSet(LS_NAME, name);
+    const rec = { name, t:+S.lastTime.toFixed(3), cause:S.lastCause, ts:Date.now() };
+
+    LB.local = (LB.local||[]).concat([rec]).sort((a,b)=>b.t-a.t).slice(0,10);
+    lsSet(LS_KEY, LB.local);
+
+    saveBtn.disabled = true; nameInput.disabled = true;
+    saveBtn.textContent = '등록 중…';
+    try{
+      if(RANK_URL && LB.mode==='public'){ await pushPublic(rec); saveBtn.textContent='등록 완료'; return; }
+      if(LB.db){
+        const ref = await LB.db.collection('scores').add(rec);
+        LB.myKey = ref.id; saveBtn.textContent='등록 완료'; return;
+      }
+      saveBtn.textContent = '내 기록에 저장됨';
+    }catch(e){
+      saveBtn.textContent = '내 기록에만 저장됨';
+    }finally{
+      renderLB();
+    }
+  }
+  saveBtn.addEventListener('click', submitScore);
+  nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submitScore(); } });
+
+  function start(){
+    reset();
+    saveRow.classList.add('hide');
+    overlay.classList.add('hide');
+    S.running=true;
+    last = performance.now();
+  }
+
+  startBtn.addEventListener('click', start);
+  answerBtn.addEventListener('click', doAnswer);
+  window.addEventListener('keydown', e=>{
+    const tag = (e.target && e.target.tagName) || '';
+    if(tag==='INPUT' || tag==='TEXTAREA') return;
+    if(e.code==='Space' || e.key===' '){
+      e.preventDefault();
+      if(!S.running){ start(); } else { doAnswer(); }
+    }
+  });
+
+  reset();
+  requestAnimationFrame(loop);
+})();
+</script>
+</body>
+</html>
