@@ -576,9 +576,20 @@
   LB.local = lsGet(LS_KEY, []) || [];
   try{ nameInput.value = lsGet(LS_NAME,'') || ''; }catch(e){}
 
+  // 같은 이름은 최고 기록 하나만 남긴다 (중복 제거)
+  function dedupe(list){
+    const best = new Map();
+    (list||[]).forEach(r=>{
+      const key = String(r.name||'익명').trim().toLowerCase();
+      const prev = best.get(key);
+      if(!prev || Number(r.t||0) > Number(prev.t||0)) best.set(key, r);
+    });
+    return Array.from(best.values()).sort((a,b)=>Number(b.t||0)-Number(a.t||0));
+  }
+
   function renderLB(){
     const shared = LB.mode!=='local';
-    const rows = (shared ? LB.rows : LB.local).slice(0,10);
+    const rows = dedupe(shared ? LB.rows : LB.local).slice(0,10);
     lbList.innerHTML = rows.map((r,i)=>{
       const mine = LB.myKey && r.key===LB.myKey;
       const icon = r.cause==='stud' ? '😡' : '💥';
@@ -645,10 +656,12 @@
   })();
 
   async function submitScore(){
+    if(LB.submitting) return;
+    LB.submitting = true;
     const name = (nameInput.value||'').trim().slice(0,12) || '익명';
     lsSet(LS_NAME, name);
     const secs = (typeof S.lastTime === 'number') ? S.lastTime : S.t;
-    if(!(secs > 0)){ return; }   // 게임오버 기록이 없으면 등록하지 않는다
+    if(!(secs > 0)){ LB.submitting = false; return; }   // 게임오버 기록이 없으면 등록하지 않는다
     const rec = { name, t:+secs.toFixed(3), cause:S.lastCause || 'prof', ts:Date.now() };
 
     LB.local = (LB.local||[]).concat([rec]).sort((a,b)=>b.t-a.t).slice(0,10);
@@ -666,6 +679,7 @@
     }catch(e){
       saveBtn.textContent = '내 기록에만 저장됨';
     }finally{
+      LB.submitting = false;
       renderLB();
     }
   }
