@@ -573,6 +573,18 @@
   function lsGet(k, fb){ try{ const v=localStorage.getItem(k); return v?JSON.parse(v):fb; }catch(e){ return fb; } }
   function lsSet(k, v){ try{ localStorage.setItem(k, JSON.stringify(v)); }catch(e){} }
 
+  // 기기마다 고유 ID 하나 (랭킹에서 한 기기는 한 칸만 차지한다)
+  const LS_DEV = 'ohhoon.device';
+  function deviceId(){
+    let id = lsGet(LS_DEV, null);
+    if(!id || typeof id!=='string'){
+      id = 'd' + Date.now().toString(36) + Math.random().toString(36).slice(2,10);
+      lsSet(LS_DEV, id);
+    }
+    return id;
+  }
+  const DEV_ID = deviceId();
+
   LB.local = lsGet(LS_KEY, []) || [];
   try{ nameInput.value = lsGet(LS_NAME,'') || ''; }catch(e){}
 
@@ -580,7 +592,7 @@
   function dedupe(list){
     const best = new Map();
     (list||[]).forEach(r=>{
-      const key = String(r.name||'익명').trim().toLowerCase();
+      const key = r.dev ? ('dev:'+r.dev) : ('nm:'+String(r.name||'익명').trim().toLowerCase());
       const prev = best.get(key);
       if(!prev || Number(r.t||0) > Number(prev.t||0)) best.set(key, r);
     });
@@ -616,14 +628,25 @@
       .sort((a,b)=>b.t-a.t);
     LB.mode='public'; LB.loaded=true; renderLB();
   }
+  // 한 기기 = 한 기록. 기존 기록보다 좋을 때만 교체한다.
   async function pushPublic(rec){
-    const r = await fetch(rankEndpoint('/scores.json'), {
-      method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify(rec)
+    const path = '/scores/' + DEV_ID + '.json';
+    let prev = null;
+    try{
+      const pr = await fetch(rankEndpoint(path), {cache:'no-store'});
+      if(pr.ok) prev = await pr.json();
+    }catch(e){}
+    LB.myKey = DEV_ID;
+    if(prev && typeof prev.t==='number' && prev.t >= rec.t){
+      await fetchPublic();
+      return 'kept';   // 기존 최고 기록 유지
+    }
+    const r = await fetch(rankEndpoint(path), {
+      method:'PUT', headers:{'Content-Type':'application/json'}, body:JSON.stringify(rec)
     });
     if(!r.ok) throw new Error('http '+r.status);
-    const out = await r.json();
-    LB.myKey = out && out.name;
     await fetchPublic();
+    return 'saved';
   }
 
   (async function initLB(){
@@ -662,7 +685,7 @@
     lsSet(LS_NAME, name);
     const secs = (typeof S.lastTime === 'number') ? S.lastTime : S.t;
     if(!(secs > 0)){ LB.submitting = false; return; }   // 게임오버 기록이 없으면 등록하지 않는다
-    const rec = { name, t:+secs.toFixed(3), cause:S.lastCause || 'prof', ts:Date.now() };
+    const rec = { name, t:+secs.toFixed(3), cause:S.lastCause || 'prof', ts:Date.now(), dev:DEV_ID };
 
     LB.local = (LB.local||[]).concat([rec]).sort((a,b)=>b.t-a.t).slice(0,10);
     lsSet(LS_KEY, LB.local);
@@ -670,10 +693,14 @@
     saveBtn.disabled = true; nameInput.disabled = true;
     saveBtn.textContent = '등록 중…';
     try{
-      if(RANK_URL && LB.mode==='public'){ await pushPublic(rec); saveBtn.textContent='등록 완료'; return; }
+      if(RANK_URL && LB.mode==='public'){
+        const how = await pushPublic(rec);
+        saveBtn.textContent = (how==='kept') ? '기존 최고 기록 유지' : '등록 완료';
+        return;
+      }
       if(LB.db){
-        const ref = await LB.db.collection('scores').add(rec);
-        LB.myKey = ref.id; saveBtn.textContent='등록 완료'; return;
+        await LB.db.collection('scores').doc(DEV_ID).set(rec);
+        LB.myKey = DEV_ID; saveBtn.textContent='등록 완료'; return;
       }
       saveBtn.textContent = '내 기록에 저장됨';
     }catch(e){
