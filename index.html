@@ -480,7 +480,7 @@
     S.over=true; S.running=false;
     endQuestion();
     const survived = S.t.toFixed(3);
-    S.lastTime = S.t; S.lastCause = kind; LB.myId = null;
+    S.lastTime = S.t; S.lastCause = kind; LB.myKey = null;
     saveRow.classList.remove('hide');
     saveBtn.disabled = false; saveBtn.textContent = '기록 등록';
     nameInput.disabled = false;
@@ -647,7 +647,9 @@
   async function submitScore(){
     const name = (nameInput.value||'').trim().slice(0,12) || '익명';
     lsSet(LS_NAME, name);
-    const rec = { name, t:+S.lastTime.toFixed(3), cause:S.lastCause, ts:Date.now() };
+    const secs = (typeof S.lastTime === 'number') ? S.lastTime : S.t;
+    if(!(secs > 0)){ return; }   // 게임오버 기록이 없으면 등록하지 않는다
+    const rec = { name, t:+secs.toFixed(3), cause:S.lastCause || 'prof', ts:Date.now() };
 
     LB.local = (LB.local||[]).concat([rec]).sort((a,b)=>b.t-a.t).slice(0,10);
     lsSet(LS_KEY, LB.local);
