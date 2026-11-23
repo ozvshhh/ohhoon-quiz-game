@@ -124,6 +124,12 @@
   #lbList li:nth-child(1) .rk{color:#ffd45e} #lbList li:nth-child(2) .rk{color:#d8dde8} #lbList li:nth-child(3) .rk{color:#d79a6a}
   #lbList .nm{flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
   #lbList .tm{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-weight:700;letter-spacing:.5px}
+  #lbBox .lbHead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+  #lbBox .lbHead .lbTitle{margin:0;flex:1;text-align:center}
+  #lbToggle{font:inherit;font-size:11px;font-weight:700;padding:4px 9px;border-radius:99px;
+    background:#2a3140;color:#cfd8e8;box-shadow:none;border:1px solid var(--line);white-space:nowrap}
+  #lbToggle:active{transform:none}
+  #lbList.all{max-height:300px}
   #lbBox .lbNote{font-size:11px;color:var(--sub);text-align:center;margin-top:8px;opacity:.8}
   #saveRow{display:flex;gap:8px;width:min(380px,92%)}
   #saveRow.hide{display:none}
@@ -197,7 +203,11 @@
     <button id="saveBtn">기록 등록</button>
   </div>
   <div id="lbBox">
-    <div class="lbTitle">🏆 명예의 전당</div>
+    <div class="lbHead">
+      <span style="width:62px"></span>
+      <div class="lbTitle">🏆 명예의 전당</div>
+      <button id="lbToggle" type="button">전체 보기</button>
+    </div>
     <ol id="lbList"></ol>
     <div class="lbNote" id="lbNote">불러오는 중…</div>
   </div>
@@ -566,6 +576,7 @@
   const saveRow = document.getElementById('saveRow');
   const nameInput = document.getElementById('nameInput');
   const saveBtn = document.getElementById('saveBtn');
+  const lbToggle = document.getElementById('lbToggle');
   const LS_KEY = 'ohhoon.scores.v1', LS_NAME = 'ohhoon.name';
 
   const LB = { mode:'local', db:null, rows:[], local:[], loaded:false, slow:false, myKey:null, timer:null };
@@ -601,7 +612,10 @@
 
   function renderLB(){
     const shared = LB.mode!=='local';
-    const rows = dedupe(shared ? LB.rows : LB.local).slice(0,10);
+    const all = dedupe(shared ? LB.rows : LB.local);
+    const rows = LB.expanded ? all : all.slice(0,10);
+    lbList.classList.toggle('all', !!LB.expanded);
+    lbToggle.textContent = LB.expanded ? 'TOP 10' : ('전체 '+all.length+'명');
     lbList.innerHTML = rows.map((r,i)=>{
       const mine = LB.myKey && r.key===LB.myKey;
       const icon = r.cause==='stud' ? '😡' : '💥';
@@ -611,7 +625,9 @@
              '<span class="tm">'+Number(r.t||0).toFixed(3)+'s</span></li>';
     }).join('') || '<li style="justify-content:center;color:#9aa5b8">아직 기록이 없다</li>';
 
-    if(LB.mode==='public') lbNote.textContent = '전체 랭킹 · 누구나 등록 가능';
+    const myRank = LB.myKey ? (all.findIndex(r=>r.key===LB.myKey || r.dev===LB.myKey)+1) : 0;
+    const mine = myRank>0 ? ('  ·  내 순위 '+myRank+'위 / '+all.length+'명') : '';
+    if(LB.mode==='public') lbNote.textContent = '전체 랭킹 · 누구나 등록 가능' + mine;
     else if(LB.mode==='artifact') lbNote.textContent = '전체 랭킹 · 접속 권한이 있는 사람';
     else if(LB.slow && !LB.loaded) lbNote.textContent = '랭킹 서버 연결 중… (이 브라우저 기록 표시)';
     else lbNote.textContent = '이 브라우저에만 저장된 기록';
@@ -710,6 +726,7 @@
       renderLB();
     }
   }
+  lbToggle.addEventListener('click', ()=>{ LB.expanded = !LB.expanded; renderLB(); });
   saveBtn.addEventListener('click', submitScore);
   nameInput.addEventListener('keydown', e=>{ if(e.key==='Enter'){ e.preventDefault(); submitScore(); } });
 
